@@ -59,7 +59,7 @@ export default {
   margin-bottom: 30px;
   margin-right: auto;
   margin-left: auto;
-  border: 1px solid #42b983;
+  border: 1px solid #2011ef;
   border-radius: 5px;
 }
 .register button {
@@ -70,7 +70,7 @@ export default {
   margin-bottom: 30px;
   margin-right: auto;
   margin-left: auto;
-  background-color: #42b983;
+  background-color: #2011ef;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -85,5 +85,5 @@ export default {
     margin-right: auto;
     margin-left: auto;
     text-transform: uppercase;
-    margin-botton: 24px;}
+    margin-bottom: 24px;}
 </style>
