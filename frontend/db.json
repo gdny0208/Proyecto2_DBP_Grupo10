@@ -1,0 +1,23 @@
+{
+  "user": [
+    {
+      "name": "anil",
+      "email": "anil@gmail.com",
+      "password": "abc",
+      "id": 1
+    },
+    {
+      "name": "giuseppe",
+      "id": 2
+    },
+    {
+      "name": "rrr",
+      "id": 3
+    }
+  ],
+  "post": {
+    "name_post": "hola",
+    "post_id": 1,
+    "id": 1
+  }
+}
