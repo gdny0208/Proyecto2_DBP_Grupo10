@@ -9,8 +9,8 @@
         <div class="post-body">
           <p>{{item.text}}</p>
         </div>
-         <button>
-               <a  v-on:click="delete2" class="dropdown-item" >Delete {{delete1 = item.id}} </a>
+         <button v-on:click ="delete2(item.id)">
+               Delete
             </button>
             <ul class="dropdown-menu">
               <li>
@@ -18,7 +18,9 @@
               </li>
             </ul>
       
-      </div><br>
+      </div>
+      
+      <br>
     </div>
 </div>
 </template>
@@ -35,13 +37,21 @@ export default {
         }
     },
     methods: {
-        async delete2() {
+      
+        async delete2(info1) {
             let pos= localStorage.getItem("user-info")
             await  axios.post("http://127.0.0.1:5000/delete",{
-            id: this.delete1,
+            id: info1,
             id2: JSON.parse(pos).id,
-          
+            
         }) 
+                let vue = this;
+        axios.get('http://localhost:5000/Post').then(function(response){
+            vue.posts = response.data;
+            console.log(vue.posts);
+            
+        })
+
         },
     },
     mounted(){
@@ -49,6 +59,7 @@ export default {
         axios.get('http://localhost:5000/Post').then(function(response){
             vue.posts = response.data;
             console.log(vue.posts);
+            
         })
     },
 };

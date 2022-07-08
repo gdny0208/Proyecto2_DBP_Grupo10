@@ -26,7 +26,6 @@ export default {
         console.warn(result);
         if(result.data.success == true){
           this.$router.push('/VerPost');
-          location.reload()
         }
       }
     }

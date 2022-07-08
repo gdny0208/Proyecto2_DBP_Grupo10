@@ -91,5 +91,5 @@ h2{
     margin-right: auto;
     margin-left: auto;
     text-transform: uppercase;
-    margin-botton: 24px;}
+    margin-bottom: 24px;}
 </style>
