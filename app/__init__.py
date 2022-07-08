@@ -4,14 +4,14 @@ from flask_login import LoginManager, current_user, login_user, logout_user, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 
-from app.models import setup_db, setup_db, User, Post, Comment, Like
+from models import setup_db, setup_db, User, Post, Comment, Like
 
 login_manager = LoginManager()
 
 def create_app(test_config=None):
     app=Flask(__name__)
     setup_db(app)
-    CORS(app, origins=['http://localhost:8086', 'http://localhost:5000'])
+    CORS(app, origins=['http://localhost:8081', 'http://localhost:5000'])
 
     @app.after_request
     def after_request(response):
@@ -57,6 +57,7 @@ def create_app(test_config=None):
             }, 404
         
         return { 
+            "success": True,
             "users": 
             [user.format() for user in users],
         }, 200
@@ -89,7 +90,7 @@ def create_app(test_config=None):
                     return {
                         "success": False,
                         "message": "Contraseña incorrecta"
-                    }, 401
+                    }, 404
             else:
                 return {
                     "success": False,
@@ -121,12 +122,12 @@ def create_app(test_config=None):
                 return jsonify({
                     'success': False,
                     'message': 'Email already exists'
-                })
+                }),400
             if username_exists:
                 return jsonify({
                     'success': False,
                     'message': 'Username already exists'
-                })
+                }),400
             if password1 != password2:
                 return jsonify({
                     'success': False,
@@ -136,12 +137,12 @@ def create_app(test_config=None):
                 return jsonify({
                     'success': False,
                     'message': 'Username must be at least 3 characters'
-                })
+                }),400
             if len(password1)<6:
                 return jsonify({
                     'success': False,
                     'message': 'Password must be at least 6 characters'
-                })
+                }),400
             if len(email)<4:
                 return jsonify({
                     'success': False,
@@ -150,12 +151,11 @@ def create_app(test_config=None):
             else:
                 user = User(email=email, username=username, password=generate_password_hash(password1, method='sha256'))
                 user.insert()
-                login_user(user)
                 return jsonify({
                     'success': True,
                     'user': user.format(),
                     'message': 'Signup successful'
-                })
+                }),200
 
     @app.route("/create_post", methods=['POST'])
     def api_create_post():
@@ -163,7 +163,7 @@ def create_app(test_config=None):
             text = request.json.get("text")
             id1 = request.json.get("id1")
             v = int(id1)
-            if not text:
+            if not text or id1 ==" " or None:
                 return jsonify({
                     'success': False,
                     'message': 'No text provided'
@@ -204,24 +204,6 @@ def create_app(test_config=None):
                     'message': 'Post deleted'
                 })
 
-    @app.route("/postuser", methods=[ 'POST'])
-    def api_get_posts():
-        if request.method == 'POST':
-            username1 = request.json.get("id2")
-            user=User.query.filter_by(username=username1).first()
-            if not user:
-                return jsonify({
-                    'success': False,
-                    'message': 'User not found'
-                })
-            
-            posts = Post.query.filter_by(author=user.id).all()
-
-            return jsonify({
-                'success': True,
-                'posts': [post.format() for post in posts]
-            })
-
     @app.route("/create-comment/<post_id>", methods=['POST'])
     @login_required
     def api_create_comment(post_id):
@@ -247,51 +229,5 @@ def create_app(test_config=None):
                     'message': 'Post does not exist'
                 })
     
-    @app.route("/delete-comment/<comment_id>", methods=['DELETE'])
-    @login_required
-    def api_delete_comment(comment_id):
-        comment=Comment.query.filter_by(id=comment_id).first()
-
-        if not comment:
-            return jsonify({
-                'success': False,
-                'message': 'Comment does not exist'
-            })
-        elif current_user.id != comment.author and current_user.id != comment.post.author:
-            return jsonify({
-                'success': False,
-                'message': 'You do not have permission to delete this comment'
-            })
-        else:
-            comment.delete()
-            return jsonify({
-                'success': True,
-                'message': 'Comment deleted'
-            })
-    
-    @app.route("/like-post/<post_id>", methods=['GET'])
-    @login_required
-    def api_like_post(post_id):
-        post=Post.query.filter_by(id=post_id).first()
-        like=Like.query.filter_by(author=current_user.id, post_id=post_id).first()
-
-        if not post:
-            return jsonify({
-                'success': False,
-                'message': 'Post does not exist'
-            })
-        elif like:
-            like.delete()
-            return jsonify({
-                'success': True,
-                'message': 'Post unliked'
-            })
-        else:
-            like = Like(author=current_user.id, post_id=post_id)
-            like.insert()
-            return jsonify({
-                'success': True,
-                'message': 'Post liked'
-            })
     
     return app
